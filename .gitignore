@@ -3,3 +3,7 @@ data/
 logs/
 output/
 transformers/
+__data/
+__output/
+src/wandb/
+wandb/

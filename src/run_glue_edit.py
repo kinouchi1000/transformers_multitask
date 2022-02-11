@@ -12,6 +12,9 @@ import datasets
 import numpy as np
 from datasets import load_dataset, load_metric
 
+# torch.set_default_tensor_type("torch.cuda.FloatTensor")
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
 import transformers
 from transformers import (
     AutoConfig,
@@ -359,7 +362,7 @@ class ClassificationHead(torch.nn.Module):
 
         self._init_weights()
 
-    def forward(self, sequence_output, pooled_output, labels=None, **kwargs):
+    def forward(self, pooled_output, labels=None, **kwargs):
         pooled_output = self.dropout(pooled_output)
         logits = self.classifier(pooled_output)
 
@@ -419,7 +422,6 @@ class MultiTaskModel(torch.nn.Module):
         position_id: torch.LongTensor = None,
         head_mask: torch.FloatTensor = None,
         inputs_embeds: torch.FloatTensor = None,
-        # encoder_hidden_state: torch.FloatTensor = None,
         output_attentions: torch.FloatTensor = None,
         labels=None,
         task_ids=None,
@@ -436,28 +438,47 @@ class MultiTaskModel(torch.nn.Module):
             output_attentions=output_attentions,
         )
 
-        sequence_output, pooler_output = outputs[:2]
-        unique_task_ids_list = torch.unique(task_ids).tolist()
+        pooler_output = outputs["pooler_output"]
+
+        # unique_task_ids_list = torch.unique(task_ids).tolist()
+        unique_task_ids_list = [0, 1]
 
         loss_list = []
-        task_logits = None
+        logits = []
         for unique_task_id in unique_task_ids_list:
             task_id_filter = task_ids == unique_task_id
 
             (task_logits, task_loss) = self.output_heads[str(unique_task_id)].forward(
-                sequence_output[task_id_filter],
                 pooler_output[task_id_filter],
                 labels=None if labels is None else labels[task_id_filter],
             )
+            if task_logits == []:
+                logits.append([100])
+            else:
+                logits.append(task_logits)
 
-            if labels is not None:
-                loss_list.append(task_loss)
+            loss_list.append(task_loss)
 
-        outputs = (task_logits, outputs[2:])
+        task_logits = []
+        count1 = 0
+        count2 = 0
+        pad = torch.tensor([-100.0, -100.0]).to(device)
+        for id in task_ids:
+            if id == 0:
+                temp = logits[0][count1]
+                l = torch.cat((temp, pad), 0)
+                task_logits.append(l)
+                count1 += 1
+            elif id == 1:
+                task_logits.append(logits[1][count2])
+                count2 += 1
+            else:
+                logger.error("例外発生")
+                sys.exit(1)
 
-        if loss_list:
-            loss = torch.stack(loss_list)
-            outputs = (loss.mean(),) + outputs
+        loss = torch.stack(loss_list)
+        task_logits = torch.stack(task_logits)
+        outputs = (loss.sum(), task_logits, task_ids)
 
         return outputs
 
@@ -465,34 +486,46 @@ class MultiTaskModel(torch.nn.Module):
 # 評価時にメトリクスを計算するために使用される関数です。
 # EvalPredictionを受け取り、メトリクスの値のディクショナリ文字列を返す必要があります。
 def compute_metrics(p: EvalPrediction):
-    preds = p.predictions[0] if isinstance(p.predictions, tuple) else p.predictions
-    print(p)
-    # Sequence classification
-    metric = load_metric("seqeval")
+    # output
+    preds = p.predictions[0]
+    task_ids = p.predictions[1]
+    unique_task_ids_list = [1, 0]
+
+    # true label
     label = p.label_ids.astype(int)
-    predictions = np.argmax(preds, axis=1)
 
-    # true_predictions = [
-    #     [f"tag-idx-{p}" for (p, l) in zip(prediction, label) if l != -100]
-    #     for prediction, label in zip(predictions, p.label_ids)
-    # ]
-    # true_labels = [
-    #     [f"tag-idx-{l}" for (p, l) in zip(prediction, label) if l != -100]
-    #     for prediction, label in zip(predictions, p.label_ids)
-    # ]
-    # make onehot vector
-    predictions = np.eye(5)[predictions]
-    label = np.eye(5)[label]
+    # metric
+    metric = load_metric("seqeval")
 
-    # Remove ignored index (special tokens)
-    results = metric.compute(
-        predictions=predictions, references=label[: len(predictions)]
-    )
+    precision = 0.0
+    recall = 0.0
+    f1 = 0.0
+    accuracy = 0.0
+
+    for unique_task_id in unique_task_ids_list:
+        task_id_filter = task_ids == unique_task_id
+        p = preds[task_id_filter]
+        l = label[task_id_filter]
+        if len(p) != len(l):
+            sys.exit(1)
+        p = np.argmax(p, axis=1)
+        # one hot
+        p = np.eye(5)[p]
+        l = np.eye(5)[l]
+        if len(p) != 0:
+            # Remove ignored index (special tokens)
+            results = metric.compute(predictions=p, references=l)
+            precision += results["overall_precision"]
+            recall += results["overall_recall"]
+            f1 += results["overall_f1"]
+            accuracy += results["overall_accuracy"]
+
+        # result
     return {
-        "precision": results["overall_precision"],
-        "recall": results["overall_recall"],
-        "f1": results["overall_f1"],
-        "accuracy": results["overall_accuracy"],
+        "precision": precision,
+        "recall": recall,
+        "f1": f1,
+        "accuracy": accuracy,
     }
 
 
@@ -517,9 +550,6 @@ def main():
             data_args,
             training_args,
         ) = parser.parse_args_into_dataclasses()
-
-    # training_args.label_names = ["psitive", "category"]
-    # training_args.label_names = ["a", "b", "c", "d", "e"]
 
     # Setup logging
     logging.basicConfig(
@@ -611,12 +641,10 @@ def main():
                 f"Sample {index}/{len(train_dataset)} of the training set: {train_dataset[index]}."
             )
 
-    print(f"(debug)train datasets:{train_dataset}")
     eval_datasets_df = eval_dataset[0].to_pandas().append(eval_dataset[1].to_pandas())
     eval_datasets = datasets.Dataset.from_pandas(eval_datasets_df)
     eval_datasets.shuffle(seed=123)
 
-    print(f"[debug]evaluate datasets:{eval_datasets}")
     # Initialize our Trainer
     trainer = Trainer(
         model=model,
@@ -627,8 +655,6 @@ def main():
         tokenizer=tokenizer,
         callbacks=[EarlyStoppingCallback(early_stopping_patience=5)],
     )
-    print(f"debug: {eval_dataset}")
-    print(f"debug: {train_dataset}")
 
     # Training
     if training_args.do_train:
@@ -656,26 +682,10 @@ def main():
     # Evaluation
     if training_args.do_eval:
 
-        for eval_d in eval_dataset:
-            logger.info(f"*** Evaluate ***")
+        # タスクごとに評価
+        for eval_d, task in zip(eval_dataset, tasks):
+            logger.info(f"*** Evaluate of {task.name} ***")
 
-            # data_collator = None
-            # if task.type == "token_classification":
-            #     data_collator = DataCollatorForTokenClassification(
-            #         tokenizer, pad_to_multiple_of=8 if training_args.fp16 else None
-            #     )
-            # else:
-            # if data_args.pad_to_max_length:
-            #     data_collator = default_data_collator
-            # elif training_args.fp16:
-            #     data_collator = DataCollatorWithPadding(tokenizer, pad_to_multiple_of=8)
-            # else:
-            #     data_collator = None
-            print(f"train dataset:{train_dataset}")
-            print(f"eval datasets:{eval_datasets}")
-            # print(f"datacollator : {data_collator}")
-
-            # trainer.data_collator = data_collator
             metrics = trainer.evaluate(eval_dataset=eval_d)
 
             max_eval_samples = (
@@ -687,6 +697,7 @@ def main():
 
             trainer.log_metrics("eval", metrics)
             trainer.save_metrics("eval", metrics)
+
     # if training_args.do_predict:
 
     #     logger.info("*** Predict ***")
