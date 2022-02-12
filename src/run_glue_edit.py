@@ -452,12 +452,16 @@ class MultiTaskModel(torch.nn.Module):
                 pooler_output[task_id_filter],
                 labels=None if labels is None else labels[task_id_filter],
             )
+            # logit
             if task_logits == []:
-                logits.append([100])
+                logits.append(torch.tensor(0).to(device))
             else:
                 logits.append(task_logits)
-
-            loss_list.append(task_loss)
+            # loss
+            if torch.any(torch.isnan(task_loss)):
+                loss_list.append(torch.tensor(0).to(device))
+            else:
+                loss_list.append(task_loss)
 
         task_logits = []
         count1 = 0
@@ -481,52 +485,6 @@ class MultiTaskModel(torch.nn.Module):
         outputs = (loss.sum(), task_logits, task_ids)
 
         return outputs
-
-
-# 評価時にメトリクスを計算するために使用される関数です。
-# EvalPredictionを受け取り、メトリクスの値のディクショナリ文字列を返す必要があります。
-def compute_metrics(p: EvalPrediction):
-    # output
-    preds = p.predictions[0]
-    task_ids = p.predictions[1]
-    unique_task_ids_list = [1, 0]
-
-    # true label
-    label = p.label_ids.astype(int)
-
-    # metric
-    metric = load_metric("seqeval")
-
-    precision = 0.0
-    recall = 0.0
-    f1 = 0.0
-    accuracy = 0.0
-
-    for unique_task_id in unique_task_ids_list:
-        task_id_filter = task_ids == unique_task_id
-        p = preds[task_id_filter]
-        l = label[task_id_filter]
-        if len(p) != len(l):
-            sys.exit(1)
-        p = np.argmax(p, axis=1)
-        # one hot
-        p = np.eye(5)[p]
-        l = np.eye(5)[l]
-        if len(p) != 0:
-            # Remove ignored index (special tokens)
-            results = metric.compute(predictions=p, references=l)
-            precision += results["overall_precision"]
-            recall += results["overall_recall"]
-            f1 += results["overall_f1"]
-            accuracy += results["overall_accuracy"]
-
-        # result
-    return {
-        "precision": precision,
-        "recall": recall,
-        "f1": f1,
-        "accuracy": accuracy,
-    }
 
 
 def main():
@@ -644,6 +602,54 @@ def main():
     eval_datasets_df = eval_dataset[0].to_pandas().append(eval_dataset[1].to_pandas())
     eval_datasets = datasets.Dataset.from_pandas(eval_datasets_df)
     eval_datasets.shuffle(seed=123)
+
+    metric = load_metric("accuracy")
+    # 評価時にメトリクスを計算するために使用される関数です。
+    # EvalPredictionを受け取り、メトリクスの値のディクショナリ文字列を返す必要があります。
+    def compute_metrics(p: EvalPrediction):
+        # output
+        preds = p.predictions[0]
+        task_ids = p.predictions[1]
+        unique_task_ids_list = [1, 0]
+        # true label
+        label = p.label_ids.astype(int)
+        # metric
+
+        # precision, recall, f1, accuracy = [], [], [], []
+        accuracy = []
+
+        for unique_task_id in unique_task_ids_list:
+            task_id_filter = task_ids == unique_task_id
+            p = preds[task_id_filter]
+            l = label[task_id_filter]
+            if len(p) != len(l):
+                sys.exit(1)
+            p = np.argmax(p, axis=1)
+
+            # one hot
+            # p = np.eye(5)[p]
+            # l = np.eye(5)[l]
+            if len(p) != 0:
+                # Remove ignored index (special tokens)
+                # results = metric.compute(predictions=p, references=l)
+                # precision.append(results["overall_precision"])
+                # recall.append(results["overall_recall"])
+                # f1.append(results["overall_f1"])
+                # accuracy.append(results["accuracy"])
+                result = (p == l).astype(np.float32).mean().item()
+                accuracy.append(result)
+
+        # result
+        return {
+            # "precision_task1": precision[0],
+            # "precision_task2": precision[1],
+            # "recall_task1": recall[0],
+            # "recall_task2": recall[1],
+            # "f1_task1": f1[0],
+            # "f1_task2": f1[1],
+            "accuracy_task1": accuracy[0],
+            "accuracy_task2": accuracy[1],
+        }
 
     # Initialize our Trainer
     trainer = Trainer(
