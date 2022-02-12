@@ -201,7 +201,6 @@ class Task:
 def tokenize_seq_classification_dataset(
     tokenizer, raw_datasets, task_id, task_name, data_args, training_args
 ):
-    sentence1_key, sentence2_key = "sentence1", "sentence2"
 
     # Padding strategy
     if data_args.pad_to_max_length:
@@ -352,7 +351,7 @@ def load_datasets(tokenizer, data_args, training_args, model_args):
     return tasks, dataset
 
 
-# Negative Positive Classification
+# text Classification
 class ClassificationHead(torch.nn.Module):
     def __init__(self, hidden_size: int, num_labels: int, dropout_p=0.1):
         super().__init__()
@@ -603,7 +602,7 @@ def main():
     eval_datasets = datasets.Dataset.from_pandas(eval_datasets_df)
     eval_datasets.shuffle(seed=123)
 
-    metric = load_metric("accuracy")
+    # metric = load_metric("accuracy")
     # 評価時にメトリクスを計算するために使用される関数です。
     # EvalPredictionを受け取り、メトリクスの値のディクショナリ文字列を返す必要があります。
     def compute_metrics(p: EvalPrediction):
