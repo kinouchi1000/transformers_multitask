@@ -8,3 +8,4 @@ __output/
 __logs/
 src/wandb/
 wandb/
+data_JED/

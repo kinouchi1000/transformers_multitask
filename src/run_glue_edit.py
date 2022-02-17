@@ -62,6 +62,9 @@ class DataTrainingArguments:
     the command line.
     """
 
+    early_stopping_step: Optional[int] = field(
+        default=5, metadata={"help": "Eearly stopping steps (default is 3)"}
+    )
     dataset_name: Optional[str] = field(
         default=None,
         metadata={"help": "The name of the dataset to use (via the datasets library)."},
@@ -371,7 +374,9 @@ class ClassificationHead(torch.nn.Module):
             if labels.dim() != 1:
                 # remove padding
                 labels = labels[:, 0]
-            loss_fct = torch.nn.CrossEntropyLoss()
+            loss_fct = torch.nn.CrossEntropyLoss(label_smoothing=0.1)
+            # print(f"logits:{logits.view(-1, self.num_labels)}")
+            # print(f"logits:{labels.long().view(-1)}")
             loss = loss_fct(logits.view(-1, self.num_labels), labels.long().view(-1))
         return (logits, loss)
 
@@ -480,8 +485,9 @@ class MultiTaskModel(torch.nn.Module):
                 sys.exit(1)
 
         loss = torch.stack(loss_list)
+        loss_ave = loss.sum() / len(unique_task_ids_list)
         task_logits = torch.stack(task_logits)
-        outputs = (loss.sum(), task_logits, task_ids)
+        outputs = (loss_ave, task_logits, task_ids)
 
         return outputs
 
@@ -624,10 +630,6 @@ def main():
             if len(p) != len(l):
                 sys.exit(1)
             p = np.argmax(p, axis=1)
-
-            # one hot
-            # p = np.eye(5)[p]
-            # l = np.eye(5)[l]
             if len(p) != 0:
                 # Remove ignored index (special tokens)
                 # results = metric.compute(predictions=p, references=l)
@@ -637,6 +639,8 @@ def main():
                 # accuracy.append(results["accuracy"])
                 result = (p == l).astype(np.float32).mean().item()
                 accuracy.append(result)
+            else:
+                accuracy.append(0)
 
         # result
         return {
@@ -658,7 +662,9 @@ def main():
         eval_dataset=eval_datasets if training_args.do_eval else None,
         compute_metrics=compute_metrics,
         tokenizer=tokenizer,
-        callbacks=[EarlyStoppingCallback(early_stopping_patience=5)],
+        # callbacks=[
+        #    EarlyStoppingCallback(early_stopping_patience=data_args.early_stopping_step)
+        # ],
     )
 
     # Training
@@ -700,8 +706,8 @@ def main():
             )
             metrics["eval_samples"] = min(max_eval_samples, len(eval_d))
 
-            trainer.log_metrics("eval", metrics)
-            trainer.save_metrics("eval", metrics)
+            trainer.log_metrics(f"eval_{task.name}", metrics)
+            trainer.save_metrics(f"eval_{task.name}", metrics)
 
     # if training_args.do_predict:
 
