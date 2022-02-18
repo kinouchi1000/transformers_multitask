@@ -1,0 +1,348 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 18%|█████████████▌                                                            | 499/2721 [01:17<05:37,  6.59it/s]
+ 18%|█████████████▌                                                            | 500/2721 [01:17<06:29,  5.71it/s][INFO|trainer.py:553] 2022-02-13 16:05:15,317 >> The following columns in the evaluation set  don't have a corresponding argument in `MultiTaskModel.forward` and have been ignored: sentence, __index_level_0__.
+[INFO|trainer.py:2353] 2022-02-13 16:05:15,319 >> ***** Running Evaluation *****
+[INFO|trainer.py:2355] 2022-02-13 16:05:15,319 >>   Num examples = 13509
+[INFO|trainer.py:2358] 2022-02-13 16:05:15,319 >>   Batch size = 8
+
+
+
+
+
+
+
+
+
+
+
+
+100%|████████████████████████████████████████████████████████████████████████▋| 1683/1689 [00:25<00:00, 64.89it/s]
+[INFO|trainer.py:2112] 2022-02-13 16:05:52,100 >> Trainer.model is not a `PreTrainedModel`, only saving its state dict.
+[INFO|tokenization_utils_base.py:2074] 2022-02-13 16:05:52,653 >> tokenizer config file saved in __output/checkpoint-500/tokenizer_config.json
+[INFO|tokenization_utils_base.py:2080] 2022-02-13 16:05:52,653 >> Special tokens file saved in __output/checkpoint-500/special_tokens_map.json
+[INFO|tokenization_t5_fast.py:162] 2022-02-13 16:05:52,682 >> Copy vocab file to __output/checkpoint-500/spiece.model
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 37%|███████████████████████████                                               | 996/2721 [03:14<04:31,  6.35it/s]
+ 37%|██████████████████████████▊                                              | 1000/2721 [03:14<05:13,  5.48it/s][INFO|trainer.py:553] 2022-02-13 16:07:12,336 >> The following columns in the evaluation set  don't have a corresponding argument in `MultiTaskModel.forward` and have been ignored: sentence, __index_level_0__.
+[INFO|trainer.py:2353] 2022-02-13 16:07:12,338 >> ***** Running Evaluation *****
+[INFO|trainer.py:2355] 2022-02-13 16:07:12,339 >>   Num examples = 13509
+[INFO|trainer.py:2358] 2022-02-13 16:07:12,339 >>   Batch size = 8
+
+
+
+
+
+
+
+
+
+
+
+
+ 99%|████████████████████████████████████████████████████████████████████████▍| 1677/1689 [00:25<00:00, 66.54it/s]
+[INFO|trainer.py:2112] 2022-02-13 16:07:38,238 >> Trainer.model is not a `PreTrainedModel`, only saving its state dict.
+[INFO|tokenization_utils_base.py:2074] 2022-02-13 16:07:38,716 >> tokenizer config file saved in __output/checkpoint-1000/tokenizer_config.json
+[INFO|tokenization_utils_base.py:2080] 2022-02-13 16:07:38,716 >> Special tokens file saved in __output/checkpoint-1000/special_tokens_map.json
+[INFO|tokenization_t5_fast.py:162] 2022-02-13 16:07:38,743 >> Copy vocab file to __output/checkpoint-1000/spiece.model
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 55%|████████████████████████████████████████                                 | 1495/2721 [05:00<03:22,  6.04it/s]
+ 55%|████████████████████████████████████████▏                                | 1500/2721 [05:01<03:42,  5.49it/s][INFO|trainer.py:553] 2022-02-13 16:08:59,019 >> The following columns in the evaluation set  don't have a corresponding argument in `MultiTaskModel.forward` and have been ignored: sentence, __index_level_0__.
+[INFO|trainer.py:2353] 2022-02-13 16:08:59,022 >> ***** Running Evaluation *****
+[INFO|trainer.py:2355] 2022-02-13 16:08:59,022 >>   Num examples = 13509
+[INFO|trainer.py:2358] 2022-02-13 16:08:59,022 >>   Batch size = 8
+
+
+
+
+
+
+
+
+
+
+
+
+ 96%|██████████████████████████████████████████████████████████████████████   | 1620/1689 [00:24<00:01, 66.52it/s]
+[INFO|trainer.py:2112] 2022-02-13 16:09:25,004 >> Trainer.model is not a `PreTrainedModel`, only saving its state dict.
+[INFO|tokenization_utils_base.py:2074] 2022-02-13 16:09:25,472 >> tokenizer config file saved in __output/checkpoint-1500/tokenizer_config.json
+[INFO|tokenization_utils_base.py:2080] 2022-02-13 16:09:25,472 >> Special tokens file saved in __output/checkpoint-1500/special_tokens_map.json
+[INFO|tokenization_t5_fast.py:162] 2022-02-13 16:09:25,500 >> Copy vocab file to __output/checkpoint-1500/spiece.model
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 74%|█████████████████████████████████████████████████████▋                   | 2000/2721 [06:48<02:08,  5.63it/s][INFO|trainer.py:553] 2022-02-13 16:10:45,855 >> The following columns in the evaluation set  don't have a corresponding argument in `MultiTaskModel.forward` and have been ignored: sentence, __index_level_0__.
+[INFO|trainer.py:2353] 2022-02-13 16:10:45,868 >> ***** Running Evaluation *****
+[INFO|trainer.py:2355] 2022-02-13 16:10:45,868 >>   Num examples = 13509
+[INFO|trainer.py:2358] 2022-02-13 16:10:45,868 >>   Batch size = 8
+  2%|█▍                                                                         | 31/1689 [00:00<00:24, 68.21it/s]
+
+
+
+
+
+
+
+
+
+
+
+
+[INFO|trainer.py:2112] 2022-02-13 16:11:11,854 >> Trainer.model is not a `PreTrainedModel`, only saving its state dict.
+[INFO|tokenization_utils_base.py:2074] 2022-02-13 16:11:12,355 >> tokenizer config file saved in __output/checkpoint-2000/tokenizer_config.json
+[INFO|tokenization_utils_base.py:2080] 2022-02-13 16:11:12,355 >> Special tokens file saved in __output/checkpoint-2000/special_tokens_map.json
+[INFO|tokenization_t5_fast.py:162] 2022-02-13 16:11:12,392 >> Copy vocab file to __output/checkpoint-2000/spiece.model
+{'eval_loss': 0.7294409871101379, 'eval_accuracy_task1': 0.6600469350814819, 'eval_accuracy_task2': 0.7738262414932251, 'eval_runtime': 25.9825, 'eval_samples_per_second': 519.928, 'eval_steps_per_second': 65.005, 'epoch': 2.21}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 92%|███████████████████████████████████████████████████████████████████      | 2500/2721 [08:34<00:37,  5.90it/s][INFO|trainer.py:553] 2022-02-13 16:12:32,430 >> The following columns in the evaluation set  don't have a corresponding argument in `MultiTaskModel.forward` and have been ignored: sentence, __index_level_0__.
+[INFO|trainer.py:2353] 2022-02-13 16:12:32,433 >> ***** Running Evaluation *****
+[INFO|trainer.py:2355] 2022-02-13 16:12:32,433 >>   Num examples = 13509
+[INFO|trainer.py:2358] 2022-02-13 16:12:32,433 >>   Batch size = 8
+  2%|█▍                                                                         | 33/1689 [00:00<00:24, 66.27it/s]
+
+
+
+
+
+
+
+
+
+
+
+
+
+[INFO|trainer.py:2112] 2022-02-13 16:12:58,449 >> Trainer.model is not a `PreTrainedModel`, only saving its state dict.
+{'eval_loss': 0.7125856876373291, 'eval_accuracy_task1': 0.6731821894645691, 'eval_accuracy_task2': 0.7752319574356079, 'eval_runtime': 26.0122, 'eval_samples_per_second': 519.333, 'eval_steps_per_second': 64.931, 'epoch': 2.76}
+[INFO|tokenization_utils_base.py:2074] 2022-02-13 16:12:58,923 >> tokenizer config file saved in __output/checkpoint-2500/tokenizer_config.json
+[INFO|tokenization_utils_base.py:2080] 2022-02-13 16:12:58,923 >> Special tokens file saved in __output/checkpoint-2500/special_tokens_map.json
+[INFO|tokenization_t5_fast.py:162] 2022-02-13 16:12:58,949 >> Copy vocab file to __output/checkpoint-2500/spiece.model
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+100%|████████████████████████████████████████████████████████████████████████▉| 2720/2721 [09:36<00:00,  6.26it/s][INFO|trainer.py:1481] 2022-02-13 16:13:34,478 >>
+Training completed. Do not forget to share your model on huggingface.co/models =)
+[INFO|trainer.py:1489] 2022-02-13 16:13:34,478 >> Loading best model from __output/checkpoint-1500 (score: 0.7093577980995178).
+100%|█████████████████████████████████████████████████████████████████████████| 2721/2721 [09:37<00:00,  4.71it/s]
+[INFO|trainer.py:2103] 2022-02-13 16:13:34,711 >> Saving model checkpoint to __output
+[INFO|trainer.py:2112] 2022-02-13 16:13:34,711 >> Trainer.model is not a `PreTrainedModel`, only saving its state dict.
+{'train_runtime': 582.5102, 'train_samples_per_second': 149.4, 'train_steps_per_second': 4.671, 'train_loss': 1.0259411358649309, 'epoch': 3.0}
+***** train metrics *****
+  epoch                    =        3.0
+  train_loss               =     1.0259
+  train_runtime            = 0:09:42.51
+  train_samples            =      29009
+  train_samples_per_second =      149.4
+  train_steps_per_second   =      4.671
+02/13/2022 16:13:35 - INFO - __main__ - *** Evaluate of negaposi ***
+[INFO|tokenization_utils_base.py:2074] 2022-02-13 16:13:35,159 >> tokenizer config file saved in __output/tokenizer_config.json
+[INFO|tokenization_utils_base.py:2080] 2022-02-13 16:13:35,159 >> Special tokens file saved in __output/special_tokens_map.json
+[INFO|tokenization_t5_fast.py:162] 2022-02-13 16:13:35,190 >> Copy vocab file to __output/spiece.model
+[INFO|trainer.py:553] 2022-02-13 16:13:35,198 >> The following columns in the evaluation set  don't have a corresponding argument in `MultiTaskModel.forward` and have been ignored: sentence.
+[INFO|trainer.py:2353] 2022-02-13 16:13:35,200 >> ***** Running Evaluation *****
+[INFO|trainer.py:2355] 2022-02-13 16:13:35,200 >>   Num examples = 7114
+[INFO|trainer.py:2358] 2022-02-13 16:13:35,200 >>   Batch size = 8
+
+
+
+
+
+
+

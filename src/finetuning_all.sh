@@ -49,7 +49,7 @@ set -eu
 # . ./run_finetuning.sh
 
 # label smoothing
-PROJECT_NAME=qa-rinna-roberta-label-smoothing
+PROJECT_NAME=qa-rinna-roberta-label-smoothing005
 MODEL_NAME=rinna/japanese-roberta-base
 TRAIN_PATH_TASK1=../data/negaposi/trainQA.csv
 TRAIN_PATH_TASK2=../data/category/trainQA.csv

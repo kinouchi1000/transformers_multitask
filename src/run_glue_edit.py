@@ -374,7 +374,7 @@ class ClassificationHead(torch.nn.Module):
             if labels.dim() != 1:
                 # remove padding
                 labels = labels[:, 0]
-            loss_fct = torch.nn.CrossEntropyLoss(label_smoothing=0.1)
+            loss_fct = torch.nn.CrossEntropyLoss(label_smoothing=0.05)
             # print(f"logits:{logits.view(-1, self.num_labels)}")
             # print(f"logits:{labels.long().view(-1)}")
             loss = loss_fct(logits.view(-1, self.num_labels), labels.long().view(-1))

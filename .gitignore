@@ -6,6 +6,7 @@ transformers/
 __data/
 __output/
 __logs/
-src/wandb/
-wandb/
 data_JED/
+
+*/wandb
+*.out
